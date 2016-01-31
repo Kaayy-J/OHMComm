@@ -1,7 +1,7 @@
 # OHMComm-Light
-OHMComm-Light is fork of OHMComm, which it an IT-Project at the university Georg Simon Ohm in Nuremberg/Germany. The goal of the project is to creating platform-independent communication framework in C++. Fore more information about this project visit the [offical site](https://github.com/doe300/OHMComm).
+OHMComm-Light is fork of [OHMComm](https://github.com/doe300/OHMComm), which it an IT-Project at the university Georg Simon Ohm in Nuremberg/Germany. The goal of the project is to create platform independent communication framework in C++. Fore more information about this project visit the [offical site](https://github.com/doe300/OHMComm).
 
-The target of OHMComm-Light is to remove some functions and improve the architecture in order to reduce the complexity. 
+The target of OHMComm-Light is to improve the architecture and to reduce its complexity. 
 
 
 -----------------------------
