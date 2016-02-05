@@ -1,10 +1,9 @@
-# OHMComm-Light
-OHMComm-Light is fork of [OHMComm](https://github.com/doe300/OHMComm), which is an IT-Project at the university Georg Simon Ohm in Nuremberg/Germany. The goal of the project is to create platform independent audio communication framework in C++. Fore more information about this project visit the [offical site](https://github.com/doe300/OHMComm).
+# OHMComm
+IT-Project at the [faculty for Computer Science of the technical university Georg Simon Ohm Nürnberg](http://www.th-nuernberg.de/seitenbaum/fakultaeten/informatik/page.html) in summer semester 2015 and winter semester 2015/2016 to create a platform-independent voice-over-IP peer-to-peer communication program in C++.
 
-The target of OHMComm-Light is to improve the architecture and to reduce its complexity. 
-
-
------------------------------
+[![Build Status](https://travis-ci.org/doe300/OHMComm.svg)](https://travis-ci.org/doe300/OHMComm)
+[![GitHub license](https://img.shields.io/github/license/doe300/OHMComm.svg)](https://github.com/doe300/OHMComm/blob/master/LICENSE)
+[![Release](https://img.shields.io/github/tag/doe300/OHMComm.svg)](https://github.com/doe300/OHMComm/releases/latest)
 
 This program is currently developed under linux (Fedora 22) and Windows (7/8) and tested under Mac OS X.
 

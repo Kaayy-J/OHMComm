@@ -3,7 +3,7 @@
 #define	RTAUDIOWRAPPER_H
 
 #include "RtAudio.h"
-#include "AudioHandler.h"
+#include "AudioInterface.h"
 #include "math.h" // ceiling
 #include <memory> // unique_ptr
 #include <string.h> //memcpy
@@ -16,15 +16,13 @@
 /*!
  * Implementation of AudioIO wrapping the RtAudio-library
  */
-class RtAudioWrapper : public AudioHandler
+class RtAudioWrapper : public AudioInterface
 {
 public:
     RtAudioWrapper();
-    RtAudioWrapper(const AudioConfiguration &audioConfig);
-
     ~RtAudioWrapper();
 
-    /* deny copies with the copy constructor */
+    /* Deny copies with the copy constructor */
     RtAudioWrapper(const RtAudioWrapper & copy) = delete;
 
     /* AudioIO methods */
@@ -42,7 +40,7 @@ public:
     void reset();
     /* sets default audio config */
     void setDefaultAudioConfig();
-    auto prepare(const std::shared_ptr<ConfigurationMode> configMode) -> bool;
+    auto prepare() -> bool;
     auto getBufferSize() -> unsigned int;
 
     /* Callbacks */

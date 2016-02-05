@@ -13,9 +13,8 @@
 //the port should be a number greater than 1024
 static const int DEFAULT_NETWORK_PORT = 12345;
 //The program's current version as string
-static const std::string OHMCOMM_VERSION = "0.7";
-//The program's home-page
-static const std::string OHMCOMM_HOMEPAGE = "http://github.com/doe300/OHMComm";
+static const std::string OHMCOMM_VERSION = "0.7b";
+
 
 struct NetworkConfiguration
 {
@@ -26,6 +25,16 @@ struct NetworkConfiguration
     std::string remoteIPAddress;
     //Remote port
     unsigned short remotePort;
+};
+
+enum class AudioFormat 
+{
+	SIGNED_INT_8,
+	SIGNED_INT_16,
+	SIGNED_INT_24,
+	SIGNED_INT_32,
+	FLOAT_32,
+	FLOAT64
 };
 
 struct AudioConfiguration
@@ -40,26 +49,14 @@ struct AudioConfiguration
     // number of maximum input channels supported by the input device
     unsigned int inputDeviceChannels;
 
-    /*!
-     * flag for the used audio-format as specified in the AudioConfiguration::AUDIO_FORMAT_XXX-flags
-     * 
-     * Unless the forceAudioFormatFlag is set, the audio-format (and the sample-rate) is determined by the AudioHandler 
-     * by matching the supported audio-formats of the audio-processors
-     */ 
-    unsigned long audioFormatFlag;
-
     // sample rate of the audio device
-    unsigned int sampleRate;
+	unsigned int sampleRate;
 
     // number of buffer frames to be sent in a single package
-    unsigned int framesPerPackage;
+    unsigned int bufferFrames;
     
-    // set if configuration forces a specific sample-rate
-    unsigned int forceSampleRate;
-    
-    // set if configuration forces a specific audio-format
-    unsigned int forceAudioFormatFlag;
-    
+	AudioFormat audioFormat;
+
     friend bool operator==(const AudioConfiguration& lhs, const AudioConfiguration& rhs)
     {
         if (lhs.outputDeviceID != rhs.outputDeviceID)
@@ -78,49 +75,6 @@ struct AudioConfiguration
             return false;
 
         return true;
-    }
-
-    //The AUDIO_FORMAT_XXX flags are the same as the RtAudioFormats
-    static const unsigned int AUDIO_FORMAT_SINT8 = 0x1;    // 8-bit signed integer.
-    static const unsigned int AUDIO_FORMAT_SINT16 = 0x2;   // 16-bit signed integer.
-    static const unsigned int AUDIO_FORMAT_SINT24 = 0x4;   // 24-bit signed integer.
-    static const unsigned int AUDIO_FORMAT_SINT32 = 0x8;   // 32-bit signed integer.
-    static const unsigned int AUDIO_FORMAT_FLOAT32 = 0x10; // Normalized between plus/minus 1.0.
-    static const unsigned int AUDIO_FORMAT_FLOAT64 = 0x20; // Normalized between plus/minus 1.0.
-    static const unsigned int AUDIO_FORMAT_ALL = 0xFFFFFFFF; // supports all audio-formats
-
-    static const unsigned int SAMPLE_RATE_8000 = 1;         // 8 kHz
-    static const unsigned int SAMPLE_RATE_12000 = 2;        // 12 kHz
-    static const unsigned int SAMPLE_RATE_16000 = 4;        // 16 kHz
-    static const unsigned int SAMPLE_RATE_24000 = 8;        // 24 kHz
-    static const unsigned int SAMPLE_RATE_32000 = 16;       // 32 kHz
-    static const unsigned int SAMPLE_RATE_44100 = 32;       // 44.1 kHz
-    static const unsigned int SAMPLE_RATE_48000 = 64;       // 48 kHz
-    static const unsigned int SAMPLE_RATE_96000 = 128;      // 96 kHz
-    static const unsigned int SAMPLE_RATE_192000 = 256;     // 192 kHz
-    static const unsigned int SAMPLE_RATE_ALL = 0xFFFFFFFF; // supports all sample-rates
-    
-    /*!
-     * Returns a human-readable string for the given AUDIO_FORMAT_XXX flag
-     * 
-     * \param audioFormatFlag AUDIO_FORMAT_XXX-flag
-     * 
-     * \param longDescription Whether to return a longer descriptions containing use-cases for the given audio-format
-     */
-    static const std::string getAudioFormatDescription(const unsigned int audioFormatFlag, bool longDescription)
-    {
-        switch(audioFormatFlag)
-        {
-            case AudioConfiguration::AUDIO_FORMAT_SINT8: return "8-bit signed integer";
-            case AudioConfiguration::AUDIO_FORMAT_SINT16: 
-                return !longDescription ? "16-bit signed integer" : "16-bit signed integer (default for PCM samples, required for WAV, supported by Opus)";
-            case AudioConfiguration::AUDIO_FORMAT_SINT24: return "24-bit signed integer";
-            case AudioConfiguration::AUDIO_FORMAT_SINT32: return "32-bit signed integer";
-            case AudioConfiguration::AUDIO_FORMAT_FLOAT32: 
-                return !longDescription ? "32-bit float" : "32-bit float (supported by Opus)";
-            case AudioConfiguration::AUDIO_FORMAT_FLOAT64: return "64-bit float";
-            default: return "unrecognized audio-format";
-        }
     }
 };
 
