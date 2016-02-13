@@ -2,10 +2,12 @@
 
 AudioInterface::AudioInterface()
 {
+	this->workingBufferInput = new char[this->maxSizeWorkingBufferInput];
 }
 
 AudioInterface::~AudioInterface()
 {
+	delete[] this->workingBufferInput;
 }
 
 auto AudioInterface::startSeqeunce() -> void
@@ -15,8 +17,6 @@ auto AudioInterface::startSeqeunce() -> void
 
 	if (this->isExecutionReady == false)
 		this->prepareForExecution();
-
-	this->configureAudioProcessors();
 }
 
 auto AudioInterface::startRecordingMode() -> void
@@ -76,7 +76,7 @@ auto AudioInterface::setDefaultAudioConfig() -> void
 
 auto AudioInterface::prepareForExecution() -> bool
 {
-	this->configureAudioProcessors();
+	this->initializeAudioProcessors();
 	this->vPrepareForExecution();
 }
 
@@ -85,16 +85,16 @@ auto AudioInterface::getBufferSize() -> unsigned int
 	return this->vGetBufferSize();
 }
 
-auto AudioInterface::setOutputStream(std::ostream* outputStream) -> void
+auto AudioInterface::setOutputStream(std::shared_ptr<std::ostream> outputStream) -> void
 {
 	this->outputStream = outputStream;
 }
 
-void AudioInterface::printAudioProcessorOrder(std::ostream& OutputStream) const
+void AudioInterface::printAudioProcessorOrder() const
 {
     for (const auto& processor : audioProcessors)
     {
-        OutputStream << processor->getName() << std::endl;
+		*outputStream << processor->getName() << std::endl;
     }
 }
 
@@ -138,28 +138,28 @@ auto AudioInterface::clearAudioProcessors() -> void
 	this->isExecutionReady = false;
 }
 
-auto AudioInterface::configureAudioProcessors() -> bool
+auto AudioInterface::initializeAudioProcessors() -> bool
 {
     for (const auto& processor : audioProcessors)
     {
         bool result = processor->configure(audioConfiguration);
-		if (result == false) // Configuration failed
+		if (result == false)
 		{
-			*outputStream << "Configuring of audio-processor '" << processor->getName() << "' failed." << std::endl;
+			*outputStream << "Initializing of audio-processor '" << processor->getName() << "' failed." << std::endl;
 			return false;
 		}
     }
     return true;
 }
 
-auto AudioInterface::cleanUpAudioProcessors() -> bool
+auto AudioInterface::disposeAudioProcessors() -> bool
 {
 	for (const auto& processor : audioProcessors)
 	{
 		bool result = processor->cleanUp();
-		if (result == false) // Configuration failed
+		if (result == false)
 		{
-			*outputStream << "CleanUp of audio-processor '" << processor->getName() << "' failed." << std::endl;
+			*outputStream << "Disposing of audio-processor '" << processor->getName() << "' failed." << std::endl;
 			return false;
 		}
 	}
@@ -191,7 +191,7 @@ auto AudioInterface::getAudioConfiguration()->AudioConfiguration
     return this->audioConfiguration;
 }
 
-void AudioInterface::processAudioOutput(void *outputBuffer, const unsigned int &outputBufferByteSize, void *userData)
+auto AudioInterface::processAudioOutput(void *outputBuffer, unsigned int outputBufferByteSize, void *userData) -> void
 {
     unsigned int bufferSize = outputBufferByteSize;
     for (unsigned int i = audioProcessors.size(); i > 0; i--)
@@ -199,22 +199,18 @@ void AudioInterface::processAudioOutput(void *outputBuffer, const unsigned int &
         bufferSize = audioProcessors.at(i-1)->processOutputData(outputBuffer, bufferSize, userData);
     }
 }
-
-void AudioInterface::processAudioInput(void *inputBuffer, const unsigned int &inputBufferByteSize, void *userData)
+ 
+auto AudioInterface::processAudioInput(void *inputBuffer, unsigned int inputBufferByteSize, void *userData) -> void
 {
+	memcpy(this->workingBufferInput, inputBuffer, inputBufferByteSize);
     unsigned int bufferSize = inputBufferByteSize;
     for (unsigned int i = 0; i < audioProcessors.size(); i++)
     {
-        bufferSize = audioProcessors.at(i)->processInputData(inputBuffer, bufferSize, userData);
+        bufferSize = audioProcessors.at(i)->processInputData(this->workingBufferInput, bufferSize, userData);
     }
 }
 
 auto AudioInterface::getIsAudioConfigSet() const -> bool
 {
     return this->isAudioConfigSet;
-}
-
-auto AudioInterface::getIsExecutionReady() const -> bool
-{
-    return this->isExecutionReady;
 }

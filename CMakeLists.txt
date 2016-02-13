@@ -19,12 +19,10 @@ endif()
 # Set output copy path
 add_subdirectory(lib/rtaudio-4.1.1 build/rtaudio)
 add_subdirectory(lib/opus-1.1 build/opus)
-add_subdirectory(lib/soxr-0.1.2 build/soxr)
 
 #Include headers in the project settings (as search-path for header-files)
 include_directories ("${PROJECT_SOURCE_DIR}/lib/rtaudio-4.1.1")
 include_directories ("${PROJECT_SOURCE_DIR}/lib/opus-1.1/include")
-include_directories ("${PROJECT_SOURCE_DIR}/lib/soxr-0.1.2/src")
 
 ####
 # Main files

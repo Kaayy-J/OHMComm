@@ -29,12 +29,23 @@ struct NetworkConfiguration
 
 enum class AudioFormat 
 {
-	SIGNED_INT_8,
-	SIGNED_INT_16,
-	SIGNED_INT_24,
-	SIGNED_INT_32,
-	FLOAT_32,
-	FLOAT64
+	SIGNED_INT_8 = 1,
+	SIGNED_INT_16 = 2,
+	SIGNED_INT_24 = 3,
+	SIGNED_INT_32 = 4,
+	FLOAT_32 = 4,
+	FLOAT_64 = 6
+};
+
+enum class BufferSizes
+{
+	BUFFER_64 = 64,
+	BUFFER_128 = 128,
+	BUFFER_256 = 256,
+	BUFFER_512 = 512,
+	BUFFER_1024 = 1024,
+	BUFFER_2048 = 2048,
+	BUFFER_4096 = 4096
 };
 
 struct AudioConfiguration
@@ -52,8 +63,7 @@ struct AudioConfiguration
     // sample rate of the audio device
 	unsigned int sampleRate;
 
-    // number of buffer frames to be sent in a single package
-    unsigned int bufferFrames;
+	BufferSizes bufferSize;
     
 	AudioFormat audioFormat;
 

@@ -1,20 +1,11 @@
 #ifndef RTAUDIOWRAPPER_H
-
 #define	RTAUDIOWRAPPER_H
 
-#include "RtAudio.h"
 #include "AudioInterface.h"
-#include "math.h" // ceiling
-#include <memory> // unique_ptr
-#include <string.h> //memcpy
-
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h> // semaphores
-#endif
+#include "RtAudio.h"
 
 /*!
- * Implementation of AudioIO wrapping the RtAudio-library
+ * Implementation of concrete AudioInterface (Wrapper class of RtAudio)
  */
 class RtAudioWrapper : public AudioInterface
 {
@@ -22,82 +13,30 @@ public:
     RtAudioWrapper();
     ~RtAudioWrapper();
 
-    /* Deny copies with the copy constructor */
-    RtAudioWrapper(const RtAudioWrapper & copy) = delete;
-
-    /* AudioIO methods */
-    void startRecordingMode();
-    void startPlaybackMode();
-    void startDuplexMode();
-    void setConfiguration(const AudioConfiguration &audioConfiguration);
-    /* suspends the stream */
-    void suspend();
-    /* resume the stream (only possible if the stream was not stopped) */
-    void resume();
-    /* close the whole communication process */
-    void stop();
-    /* stop() and resets audioConfiguration */
-    void reset();
-    /* sets default audio config */
-    void setDefaultAudioConfig();
-    auto prepare() -> bool;
-    auto getBufferSize() -> unsigned int;
-
     /* Callbacks */
     auto callback(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void *userData) -> int;
     static auto callbackHelper(void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames, double streamTime, RtAudioStreamStatus status, void *rtAudioWrapperObject) -> int;
 
-private:
-    void *bufferAudioOutput;
-
-
+protected:
     RtAudio rtaudio;
-    RtAudio::StreamParameters input, output;
+    RtAudio::StreamParameters inputConfig, outputConfig;
+	unsigned int bufferSizeInNumberOfSamples, inputBufferSizeInBytes, outputBufferSizeInBytes;
 
-    unsigned int outputBufferByteSize = 0;
-    unsigned int inputBufferByteSize = 0;
+	auto getRtAudioFormat(const AudioConfiguration &audioConfig) -> RtAudioFormat;
+	auto setActualBufferSizes() -> void;
+	auto initializeRtAudioStreamParameters() -> void;
 
-    StreamData *streamData;
-
-    /* preparing for a openstream call */
-    auto initRtAudioStreamParameters() -> bool;
-
-    /* returns the size of a frame in bytes */
-    auto getAudioFormatByteSize(RtAudioFormat rtaudioFormat) -> int;
-
-    /* returns the actual output framesize in bytes */
-    auto getOutputFrameSize() -> int;
-
-    /* returns the actual input framesize in bytes */
-    auto getInputFrameSize() -> int;
-
-    /*!
-     * Automatically selects the best audio format out of the supported formats
-     */
-    auto autoSelectAudioFormat(RtAudioFormat supportedFormats) -> RtAudioFormat;
-
-    /*!
-     * Returns the sample-rate as number of the best supported sample-rate flag
-     */
-    auto autoSelectSampleRate(unsigned int supportedRatesFlag) -> unsigned int;
-
-    /*!
-     * "Asks" the AudioProcessors for supported audio-configuration and uses the sample-rate, frame-size and
-     * number of samples per package all processors can agree on
-     *
-     * \return whether all processors could agree on a value for every field
-     */
-    bool queryProcessorSupport();
-
-    /*!
-     * Maps the supported sample-rates from the device to the flags specified in AudioConfiguration
-     */
-    unsigned int mapDeviceSampleRates(std::vector<unsigned int> sampleRates);
-
-    /*!
-     * Returns the best match for the number of buffered frames according to all processors
-     */
-    unsigned int findOptimalBufferSize(unsigned int defaultBufferSize);
+	auto vStartRecordingMode() -> void;
+	auto vStartPlaybackMode() -> void;
+	auto vStartDuplexMode() -> void;
+	auto vSetConfiguration(AudioConfiguration audioConfiguration) -> void;
+	auto vSuspend() -> void;
+	auto vResume() -> void;
+	auto vStop() -> void;
+	auto vReset() -> void;
+	auto vSetDefaultAudioConfig() -> void;
+	auto vPrepareForExecution() -> bool;
+	auto vGetBufferSize() -> unsigned int;
 };
 
 #endif
